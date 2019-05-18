@@ -28,7 +28,7 @@ import 'bootstrap';
 import $ from 'jquery';
 import Section from './models/Section';
 import Course from './models/Course';
-import Schedule, { ScheduleJSON } from './models/Schedule';
+import { ScheduleJSON } from './models/Schedule';
 import { Semester } from './models/Catalog';
 import Event from './models/Event';
 import ScheduleGenerator from './algorithm/ScheduleGenerator';
@@ -40,7 +40,8 @@ import { to12hr, savePlain } from './utils';
 import Meta, { getDefaultData } from './models/Meta';
 import { toICal } from './utils/ICal';
 import noti from './store/notification';
-
+import currentSchedule, { Schedule } from './store/Schedule';
+import proposedSchedule from './store/Schedule';
 // these two properties must be non-reactive,
 // otherwise the reactive observer will slow down execution significantly
 window.scheduleEvaluator = new ScheduleEvaluator();
@@ -71,9 +72,9 @@ export default class App extends Vue {
     semesters: Semester[] = [];
     currentSemester: Semester | null = null;
     currentScheduleIndex = 0;
-    currentSchedule = new Schedule();
+    // currentSchedule = new Schedule();
 
-    proposedSchedules = [new Schedule()];
+    proposedSchedules = [proposedSchedule];
     proposedScheduleIndex = 0;
     /**
      * The index of the proposed schedule corresponding to the generated schedule
@@ -113,7 +114,7 @@ export default class App extends Vue {
 
     // filter settings
     /**
-     * index 0 - 4: whether Mo - Tu are selected
+     * index 0 - 4: whether Mo - Fr are selected
      *
      * 6: start time, of 24 hour format
      *
@@ -160,7 +161,7 @@ export default class App extends Vue {
      * get the list of current ids, sorted in alphabetical order of the keys
      */
     get currentIds(): Array<[string, string]> {
-        return Object.entries(this.currentSchedule.currentIds).sort((a, b) =>
+        return Object.entries(currentSchedule.currentIds).sort((a, b) =>
             a[0] === b[0] ? 0 : a[0] < b[0] ? -1 : 1
         );
     }
