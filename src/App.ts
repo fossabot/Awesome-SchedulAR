@@ -10,7 +10,7 @@
 import { createDecorator } from 'vue-class-component';
 import { ComputedOptions } from 'vue';
 import displaySettings, { DisplayState, defaultDisplay } from './store/display';
-(window as any).displaySettings = displaySettings;
+import { noti } from './store/notification';
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import ClassList from './components/ClassList.vue';
@@ -39,7 +39,6 @@ import { loadTimeMatrix, loadBuildingList } from './data/BuildingLoader';
 import { to12hr, savePlain } from './utils';
 import Meta, { getDefaultData } from './models/Meta';
 import { toICal } from './utils/ICal';
-import noti from './store/notification';
 import currentSchedule, { Schedule } from './store/Schedule';
 import proposedSchedule from './store/Schedule';
 // these two properties must be non-reactive,
@@ -139,6 +138,7 @@ export default class App extends Vue {
     exportJson: string = 'schedule';
     exportICal: string = 'schedule';
     multiSelect: boolean = true;
+    lastUpdate: string = '';
 
     get sideBarActive() {
         for (const key in this.sideBar) {
@@ -454,6 +454,7 @@ export default class App extends Vue {
         //  if the a catalog object is returned
         if (result.payload) {
             window.catalog = result.payload;
+            this.lastUpdate = new Date(window.catalog.modified).toLocaleString();
             const data = localStorage.getItem(this.currentSemester.id);
 
             let raw_data: { [x: string]: any } = {};
